@@ -12,11 +12,12 @@ builds:
    goarm:
      - 6
      - 7
-archive:
-  replacements:
-    darwin: macOS
-    amd64: x86_64
-  wrap_in_directory: true
+archives:
+  -
+   replacements:
+     darwin: macOS
+     amd64: x86_64
+   wrap_in_directory: true
 checksum:
   name_template: 'checksums.txt'
 snapshot:
