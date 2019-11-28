@@ -65,6 +65,7 @@ type Detourer struct {
 	idMap map[uint32]uint64 // The map of III BibIDs to ExL IDs.
 	primo string            // The domain name (host) for the target Primo instance.
 	vid   string            // The vid parameter to use when building Primo URLs.
+	lp    *url.URL          // The landing page for redirects.
 }
 
 // The Detourer serves HTTP redirects based on the request.
@@ -97,6 +98,13 @@ func (d Detourer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Set the vid parameter on all redirects.
 	setParamInURL(redirectTo, "vid", d.vid)
+
+	// If the landing page has been set, set the dest param to the final URL.
+	if d.lp != nil {
+		dest := redirectTo.String()
+		redirectTo = d.lp
+		setParamInURL(redirectTo, "dest", dest)
+	}
 
 	// Send the redirect to the client.
 	http.Redirect(w, r, redirectTo.String(), http.StatusMovedPermanently)
@@ -220,11 +228,13 @@ func main() {
 	addr := flag.String("address", DefaultAddress, "Address to bind on.")
 	subdomain := flag.String("primo", "", "The subdomain of the target Primo instance, ?????.primo.exlibrisgroup.com. Required.")
 	vid := flag.String("vid", "", "VID parameter for Primo. Required.")
+	landingpage := flag.String("landingpage", "", "Landing page for redirects. Optional.")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Permanent Detour: A tiny web service which redirects Sierra Web OPAC requests to Primo URLs.\n")
 		fmt.Fprintf(os.Stderr, "Version %v\n", version)
 		fmt.Fprintf(os.Stderr, "Usage: permanentdetour [flag...] [file...]\n")
+		fmt.Fprintf(os.Stderr, "If 'landingpage' flag is supplied, redirects will go to page?dest=finaldest.")
 		flag.PrintDefaults()
 		fmt.Fprintln(os.Stderr, "  Environment variables read when flag is unset:")
 
@@ -249,10 +259,22 @@ func main() {
 		log.Fatalln("A vid is required.")
 	}
 
+	var lp *url.URL
+
+	// Check the page flag
+	if *landingpage != "" {
+		var err error // avoid shadowing
+		lp, err = url.Parse(*landingpage)
+		if err != nil {
+			log.Fatalf("Error parsing landing page '%v' as URL: %v", *landingpage, err)
+		}
+	}
+
 	// The Detourer has all the data needed to build redirects.
 	d := Detourer{
 		primo: fmt.Sprintf("%v.%v", *subdomain, PrimoDomain),
 		vid:   *vid,
+		lp:    lp,
 	}
 
 	// Map of III BibIDs to ExL IDs
