@@ -234,9 +234,9 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Permanent Detour: A tiny web service which redirects Sierra Web OPAC requests to Primo URLs.\n")
 		fmt.Fprintf(os.Stderr, "Version %v\n", version)
 		fmt.Fprintf(os.Stderr, "Usage: permanentdetour [flag...] [file...]\n")
-		fmt.Fprintf(os.Stderr, "If 'landingpage' flag is supplied, redirects will go to page?dest=finaldest.")
+		fmt.Fprintf(os.Stderr, "If 'landingpage' flag is supplied, redirects will go to page?dest=finaldest\n\n")
 		flag.PrintDefaults()
-		fmt.Fprintln(os.Stderr, "  Environment variables read when flag is unset:")
+		fmt.Fprintln(os.Stderr, "\n  Environment variables read when flag is unset:")
 
 		flag.VisitAll(func(f *flag.Flag) {
 			uppercaseName := strings.ToUpper(f.Name)
