@@ -268,6 +268,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error parsing landing page '%v' as URL: %v", *landingpage, err)
 		}
+		log.Printf("Landing Page: %v\n", lp.String())
 	}
 
 	// The Detourer has all the data needed to build redirects.
@@ -276,6 +277,9 @@ func main() {
 		vid:   *vid,
 		lp:    lp,
 	}
+
+	log.Printf("Primo Instance: %v\n", d.primo)
+	log.Printf("VID: %v\n", d.vid)
 
 	// Map of III BibIDs to ExL IDs
 	// The initial size is an estimate based on the number of arguments.
