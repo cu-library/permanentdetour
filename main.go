@@ -373,7 +373,7 @@ func processLine(line string) (bibID uint32, exlID uint64, _ error) {
 	if len(splitLine) < 2 {
 		return bibID, exlID, fmt.Errorf("line has incorrect number of fields, 2 expected, %v found", len(splitLine))
 	}
-	// The bibIDs look like this: a1234-instid
+	// The bibIDs look like this: a1234x-instid
 	// We need to strip off the first character and anything after the dash.
 	dashIndex := strings.Index(splitLine[1], "-")
 	if (dashIndex == 0) || (dashIndex == 1) {
@@ -382,9 +382,9 @@ func processLine(line string) (bibID uint32, exlID uint64, _ error) {
 	bibIDString := "invalid"
 	// If the dash isn't found, use the whole bibID field except the first character.
 	if dashIndex == -1 {
-		bibIDString = splitLine[1][1:]
+		bibIDString = splitLine[1][1:len(splitLine[1])-1]
 	} else {
-		bibIDString = splitLine[1][1:dashIndex]
+		bibIDString = splitLine[1][1:dashIndex-1]
 	}
 	bibID64, err := strconv.ParseUint(bibIDString, 10, 32)
 	if err != nil {
